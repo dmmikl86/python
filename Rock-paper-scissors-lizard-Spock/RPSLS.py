@@ -74,6 +74,29 @@ def rpsls(player_choice_in_name):
 		print 'Computer wins!'
 
 
+def rpslsNumder(player_choice_in_name):
+	computer_choice = random.randrange(0, 5)
+	computer_choice_name = number_to_name(computer_choice)
+	print
+	print 'Player chooses ' + player_choice_in_name
+	print 'Computer chooses ' + computer_choice_name
+	player_choice = name_to_number(player_choice_in_name)
+	result = (player_choice - computer_choice) % 5
+	if result == 0:
+		print "standoff"
+		return
+	if result <= 2:
+		print "Player Win"
+	else:
+		print "Computer Win"
+
+
+rpslsNumder("rock")
+rpslsNumder("Spock")
+rpslsNumder("paper")
+rpslsNumder("lizard")
+rpslsNumder("scissors")
+
 rpsls("rock")
 rpsls("Spock")
 rpsls("paper")
