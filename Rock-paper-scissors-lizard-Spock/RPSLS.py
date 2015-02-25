@@ -79,5 +79,3 @@ rpsls("Spock")
 rpsls("paper")
 rpsls("lizard")
 rpsls("scissors")
-
-
