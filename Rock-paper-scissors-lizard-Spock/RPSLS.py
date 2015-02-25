@@ -49,26 +49,26 @@ def number_to_name(number):
 		return ''
 
 
-def rpsls(playerChoiceInName):
+def rpsls(player_choice_in_name):
 	print ''
-	computerChoiceInNumber = random.randrange(0, 5)
-	computerChoiceName = number_to_name(computerChoiceInNumber)
+	computer_choice_in_number = random.randrange(0, 5)
+	computer_choice_name = number_to_name(computer_choice_in_number)
 
-	print 'Player chooses ' + playerChoiceInName
-	print 'Computer chooses ' + computerChoiceName
+	print 'Player chooses ' + player_choice_in_name
+	print 'Computer chooses ' + computer_choice_name
 
-	if playerChoiceInName == SCISSORS:
-		isPlayerWin = computerChoiceName == PAPER or computerChoiceName == LIZARD
-	elif playerChoiceInName == PAPER:
-		isPlayerWin = computerChoiceName == SPOCK or computerChoiceName == ROCK
-	elif playerChoiceInName == ROCK:
-		isPlayerWin = computerChoiceName == SCISSORS or computerChoiceName == LIZARD
-	elif playerChoiceInName == LIZARD:
-		isPlayerWin = computerChoiceName == PAPER or computerChoiceName == SPOCK
-	else:  # playerChoiceInName == SPOCK:
-		isPlayerWin = computerChoiceName == SCISSORS or computerChoiceName == ROCK
+	if player_choice_in_name == SCISSORS:
+		is_player_win = computer_choice_name == PAPER or computer_choice_name == LIZARD
+	elif player_choice_in_name == PAPER:
+		is_player_win = computer_choice_name == SPOCK or computer_choice_name == ROCK
+	elif player_choice_in_name == ROCK:
+		is_player_win = computer_choice_name == SCISSORS or computer_choice_name == LIZARD
+	elif player_choice_in_name == LIZARD:
+		is_player_win = computer_choice_name == PAPER or computer_choice_name == SPOCK
+	else:  # player_choice_in_name == SPOCK:
+		is_player_win = computer_choice_name == SCISSORS or computer_choice_name == ROCK
 
-	if (isPlayerWin):
+	if is_player_win:
 		print 'Player wins!'
 	else:
 		print 'Computer wins!'
