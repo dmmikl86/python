@@ -1,6 +1,4 @@
 # Rock-paper-scissors-lizard-Spock template
-
-
 # The key idea of this program is to equate the strings
 # "rock", "paper", "scissors", "lizard", "Spock" to numbers
 # as follows:
@@ -10,69 +8,76 @@
 # 2 - paper
 # 3 - lizard
 # 4 - scissors
+import random
 
-# helper functions
+SCISSORS = 'scissors'
+LIZARD = 'lizard'
+PAPER = 'paper'
+SPOCK = 'Spock'
+ROCK = 'rock'
+
 
 def name_to_number(name):
-    if name == 'rock':
-        return 0
-    elif name == 'Spock':
-        return 1
-    elif name == 'paper':
-        return 2
-    elif name == 'lizard':
-        return 3
-    elif name == 'scissors':
-        return 4
-    else:
-        print "Wrong value : " + name
-        return -1
+	if name == ROCK:
+		return 0
+	elif name == SPOCK:
+		return 1
+	elif name == PAPER:
+		return 2
+	elif name == LIZARD:
+		return 3
+	elif name == SCISSORS:
+		return 4
+	else:
+		print "Wrong value : " + name
+		return -1
 
 
 def number_to_name(number):
-    if number == 0:
-        return 'rock'
-    elif number == 1:
-        return 'Spock'
-    elif number == 2:
-        return 'paper'
-    elif number == 3:
-        return 'lizard'
-    elif number == 4:
-        return 'scissors'
-    else:
-        print "Wrong value : " + number
-        return ''
+	if number == 0:
+		return ROCK
+	elif number == 1:
+		return SPOCK
+	elif number == 2:
+		return PAPER
+	elif number == 3:
+		return LIZARD
+	elif number == 4:
+		return SCISSORS
+	else:
+		print "Wrong value : " + number
+		return ''
 
 
-def rpsls(player_choice):
-    # delete the following pass statement and fill in your code below
-    pass
+def rpsls(playerChoiceInName):
+	print ''
+	computerChoiceInNumber = random.randrange(0, 5)
+	computerChoiceName = number_to_name(computerChoiceInNumber)
 
-    # print a blank line to separate consecutive games
+	print 'Player chooses ' + playerChoiceInName
+	print 'Computer chooses ' + computerChoiceName
 
-    # print out the message for the player's choice
+	if playerChoiceInName == SCISSORS:
+		isPlayerWin = computerChoiceName == PAPER or computerChoiceName == LIZARD
+	elif playerChoiceInName == PAPER:
+		isPlayerWin = computerChoiceName == SPOCK or computerChoiceName == ROCK
+	elif playerChoiceInName == ROCK:
+		isPlayerWin = computerChoiceName == SCISSORS or computerChoiceName == LIZARD
+	elif playerChoiceInName == LIZARD:
+		isPlayerWin = computerChoiceName == PAPER or computerChoiceName == SPOCK
+	else:  # playerChoiceInName == SPOCK:
+		isPlayerWin = computerChoiceName == SCISSORS or computerChoiceName == ROCK
 
-    # convert the player's choice to player_number using the function name_to_number()
-
-    # compute random guess for comp_number using random.randrange()
-
-    # convert comp_number to comp_choice using the function number_to_name()
-
-    # print out the message for computer's choice
-
-    # compute difference of comp_number and player_number modulo five
-
-    # use if/elif/else to determine winner, print winner message
+	if (isPlayerWin):
+		print 'Player wins!'
+	else:
+		print 'Computer wins!'
 
 
-# test your code - THESE CALLS MUST BE PRESENT IN YOUR SUBMITTED CODE
 rpsls("rock")
 rpsls("Spock")
 rpsls("paper")
 rpsls("lizard")
 rpsls("scissors")
-
-# always remember to check your completed program against the grading rubric
 
 
