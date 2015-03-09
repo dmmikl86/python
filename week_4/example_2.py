@@ -9,12 +9,12 @@ import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 def draw(canvas):
     canvas.draw_circle([100, 100], 50, 2, "Red", "Pink")
     canvas.draw_circle([300, 300], 50, 2, "Red", "Pink")
-    canvas.draw_line([100, 100],[300, 300], 2, "Black")
+    canvas.draw_line([100, 100], [300, 300], 2, "Black")
     canvas.draw_circle([100, 300], 50, 2, "Green", "Lime")
     canvas.draw_circle([300, 100], 50, 2, "Green", "Lime")
-    canvas.draw_line([100, 300],[300, 100], 2, "Black")
+    canvas.draw_line([100, 300], [300, 100], 2, "Black")
     canvas.draw_polygon([[150, 150], [250, 150], [250, 250], [150, 250]], 2,
-          "Blue", "Aqua")
+                        "Blue", "Aqua")
     canvas.draw_text("An example of drawing", [60, 385], 24, "Black")
 
 

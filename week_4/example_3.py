@@ -4,7 +4,7 @@
 s1 = "Rixner's funny"
 s2 = 'Warren wears nice ties!'
 s3 = " t-shirts!"
-#print s1, s2
+# print s1, s2
 #print s3
 
 # Combining strings
