@@ -36,10 +36,12 @@ def new_game():
     paddle2_pos = HEIGHT / 2 + PAD_HEIGHT / 2
     paddle1_vel = 0
     paddle2_vel = 0
+    score1 = 0
+    score2 = 0
+
 
 def draw(canvas):
     global score1, score2, paddle1_pos, paddle2_pos, ball_pos, ball_vel
-
 
     # draw mid line and gutters
     canvas.draw_line([WIDTH / 2, 0], [WIDTH / 2, HEIGHT], 1, "White")
@@ -69,13 +71,20 @@ def draw(canvas):
         if (paddle1_pos >= ball_pos[1] >= paddle1_pos - PAD_HEIGHT and ball_pos[0] < WIDTH / 2) \
                 or (paddle2_pos >= ball_pos[1] >= paddle2_pos - PAD_HEIGHT and ball_pos[0] > WIDTH / 2):
             ball_vel[0] = - ball_vel[0]
+            ball_vel[0] *= 1.1
+            ball_vel[1] *= 1.1
         else:
+            if ball_pos[0] < WIDTH / 2:
+                score2 += 1
+            else:
+                score1 += 1
             spawn_ball(ball_pos[0] < WIDTH / 2)
-            # game over
     elif ball_pos[1] <= BALL_RADIUS or ball_pos[1] >= HEIGHT - BALL_RADIUS:
         ball_vel[1] = - ball_vel[1]
 
-        # draw scores
+    # draw scores
+    canvas.draw_text(str(score1), (280, 20), 20, 'Red')
+    canvas.draw_text(str(score2), (320, 20), 20, 'Red')
 
 def keydown(key):
     global paddle1_vel, paddle2_vel
@@ -95,11 +104,15 @@ def keyup(key):
     if key == simplegui.KEY_MAP['w'] or key == simplegui.KEY_MAP['s']:
         paddle1_vel = 0
 
+def on_reset():
+    new_game()
+
 # create frame
 frame = simplegui.create_frame("Pong", WIDTH, HEIGHT)
 frame.set_draw_handler(draw)
 frame.set_keydown_handler(keydown)
 frame.set_keyup_handler(keyup)
+frame.add_button("Reset", on_reset)
 
 
 # start frame
