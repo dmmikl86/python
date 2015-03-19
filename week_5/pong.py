@@ -18,7 +18,6 @@ RIGHT = True
 ball_pos = [WIDTH / 2, HEIGHT / 2]
 ball_vel = [0, 0]
 
-
 def spawn_ball(direction):
     # if direction is RIGHT, the ball's velocity is upper right, else upper left
     global ball_pos, ball_vel  # these are vectors stored as lists
@@ -27,7 +26,6 @@ def spawn_ball(direction):
         ball_vel = [-random.randrange(120, 240) / 60, -random.randrange(60, 180) / 60]
     else:
         ball_vel = [random.randrange(120, 240) / 60, -random.randrange(60, 180) / 60]
-
 
 # define event handlers
 def new_game():
@@ -38,7 +36,6 @@ def new_game():
     paddle2_pos = HEIGHT / 2 + PAD_HEIGHT / 2
     paddle1_vel = 0
     paddle2_vel = 0
-
 
 def draw(canvas):
     global score1, score2, paddle1_pos, paddle2_pos, ball_pos, ball_vel
@@ -52,13 +49,6 @@ def draw(canvas):
     # update ball
     ball_pos[0] += ball_vel[0]
     ball_pos[1] += ball_vel[1]
-
-    if ball_pos[0] - PAD_WIDTH <= BALL_RADIUS or ball_pos[0] + PAD_WIDTH >= WIDTH - BALL_RADIUS:
-        ball_vel[0] = - ball_vel[0]
-        spawn_ball(ball_pos[0] < WIDTH / 2)
-        # game over
-    elif ball_pos[1] <= BALL_RADIUS or ball_pos[1] >= HEIGHT - BALL_RADIUS:
-        ball_vel[1] = - ball_vel[1]
 
     # draw ball
     canvas.draw_circle(ball_pos, BALL_RADIUS, 2, "Green", "White")
@@ -75,9 +65,17 @@ def draw(canvas):
     canvas.draw_line([WIDTH - 1, paddle2_pos], [WIDTH - 1, paddle2_pos - PAD_HEIGHT], PAD_WIDTH * 2, "White")
 
     # determine whether paddle and ball collide
+    if ball_pos[0] - PAD_WIDTH <= BALL_RADIUS or ball_pos[0] + PAD_WIDTH >= WIDTH - BALL_RADIUS:
+        if (paddle1_pos >= ball_pos[1] >= paddle1_pos - PAD_HEIGHT and ball_pos[0] < WIDTH / 2) \
+                or (paddle2_pos >= ball_pos[1] >= paddle2_pos - PAD_HEIGHT and ball_pos[0] > WIDTH / 2):
+            ball_vel[0] = - ball_vel[0]
+        else:
+            spawn_ball(ball_pos[0] < WIDTH / 2)
+            # game over
+    elif ball_pos[1] <= BALL_RADIUS or ball_pos[1] >= HEIGHT - BALL_RADIUS:
+        ball_vel[1] = - ball_vel[1]
 
-    # draw scores
-
+        # draw scores
 
 def keydown(key):
     global paddle1_vel, paddle2_vel
@@ -89,7 +87,6 @@ def keydown(key):
         paddle2_vel = 5
     if key == simplegui.KEY_MAP['s']:
         paddle1_vel = 5
-
 
 def keyup(key):
     global paddle1_vel, paddle2_vel
