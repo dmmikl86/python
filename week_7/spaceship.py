@@ -4,8 +4,7 @@ import math
 import random
 
 # globals for user interface
-FRICTION = 0.985
-MAX_SPEED = 10
+FRICTION = 0.98
 WIDTH = 800
 HEIGHT = 600
 score = 0
@@ -113,17 +112,13 @@ class Ship:
         self.angle %= 360
         if self.thrust:
             ship_thrust_sound.play()
-            self.vel[0] += angle_to_vector(math.radians(self.angle))[0]
-            self.vel[1] += angle_to_vector(math.radians(self.angle))[1]
+            self.vel[0] += (angle_to_vector(math.radians(self.angle))[0] / 8)
+            self.vel[1] += (angle_to_vector(math.radians(self.angle))[1] / 8)
         else:
             ship_thrust_sound.rewind()
 
         self.vel[0] *= FRICTION
         self.vel[1] *= FRICTION
-        self.vel[0] = -MAX_SPEED if self.vel[0] < -MAX_SPEED else self.vel[0]
-        self.vel[1] = -MAX_SPEED if self.vel[1] < -MAX_SPEED else self.vel[1]
-        self.vel[0] = MAX_SPEED if self.vel[0] > MAX_SPEED else self.vel[0]
-        self.vel[1] = MAX_SPEED if self.vel[1] > MAX_SPEED else self.vel[1]
         self.pos[0] += self.vel[0]
         self.pos[1] += self.vel[1]
         beyond_the_boundaries(self.pos)
