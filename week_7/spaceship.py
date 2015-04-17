@@ -69,11 +69,12 @@ explosion_info = ImageInfo([64, 64], [128, 128], 17, 24, True)
 explosion_image = simplegui.load_image("http://commondatastorage.googleapis.com/codeskulptor-assets/lathrop/explosion_alpha.png")
 
 # sound assets purchased from sounddogs.com, please do not redistribute
-soundtrack = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.mp3")
-missile_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/missile.mp3")
+# TODO switch sound to mp3
+soundtrack = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/soundtrack.ogg")
+missile_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/missile.ogg")
 missile_sound.set_volume(.5)
 ship_thrust_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/thrust.ogg")
-explosion_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/explosion.mp3")
+explosion_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/sounddogs/explosion.ogg")
 
 # helper functions to handle transformations
 def angle_to_vector(ang):
@@ -182,12 +183,18 @@ def rock_spawner():
                     asteroid_image, asteroid_info)
 
 def keydown(key):
+    global a_missile
     if key == simplegui.KEY_MAP['up']:
         my_ship.thrust = True
     if key == simplegui.KEY_MAP['left']:
         my_ship.angle_vel = -3
     if key == simplegui.KEY_MAP['right']:
         my_ship.angle_vel = 3
+    if key == simplegui.KEY_MAP['space']:
+        vector = angle_to_vector(math.radians(my_ship.angle))
+        a_missile = Sprite([my_ship.pos[0] + vector[0]*35, my_ship.pos[1] + vector[1]*35],
+                           [my_ship.vel[0] + vector[0]*10, my_ship.vel[1] + vector[1]*10],
+                           my_ship.angle, 0, missile_image, missile_info, missile_sound)
 
 def keyup(key):
     if key == simplegui.KEY_MAP['up']:
@@ -195,13 +202,14 @@ def keyup(key):
     if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['right']:
         my_ship.angle_vel = 0
 
+
 # initialize frame
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [-1, -1], 0, 1, asteroid_image, asteroid_info)
-a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1, 1], 0, 0, missile_image, missile_info, missile_sound)
+a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [0, 0], 0, 1, asteroid_image, asteroid_info)
+a_missile = Sprite([-1, -1], [0, 0], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
 frame.set_draw_handler(draw)
@@ -211,5 +219,5 @@ frame.set_keyup_handler(keyup)
 timer = simplegui.create_timer(1000.0, rock_spawner)
 
 # get things rolling
-timer.start()
+#timer.start()
 frame.start()
