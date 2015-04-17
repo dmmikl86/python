@@ -83,8 +83,8 @@ def dist(p, q):
     return math.sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2)
 
 def beyond_the_boundaries(pos):
-        pos[0] %= WIDTH
-        pos[1] %= HEIGHT
+    pos[0] %= WIDTH
+    pos[1] %= HEIGHT
 
 # Ship class
 class Ship:
@@ -145,7 +145,11 @@ class Sprite:
         canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, math.radians(self.angle))
 
     def update(self):
-        pass
+        self.angle += self.angle_vel
+        self.angle %= 360
+        self.pos[0] += self.vel[0]
+        self.pos[1] += self.vel[1]
+        beyond_the_boundaries(self.pos)
 
 def draw(canvas):
     global time
@@ -171,7 +175,11 @@ def draw(canvas):
 
 # timer handler that spawns a rock
 def rock_spawner():
-    pass
+    global a_rock
+    a_rock = Sprite([random.randint(100, WIDTH - 100), random.randint(100, HEIGHT - 100)],
+                    [random.randint(-3, 3), random.randint(-3, 3)],
+                    0, random.randint(-3, 3),
+                    asteroid_image, asteroid_info)
 
 def keydown(key):
     if key == simplegui.KEY_MAP['up']:
@@ -192,7 +200,7 @@ frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
+a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [-1, -1], 0, 1, asteroid_image, asteroid_info)
 a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1, 1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
