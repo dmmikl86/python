@@ -93,12 +93,14 @@ def dist(p, q):
 def group_collide(group, other_sprite):
     global rock_counter
     set_remove = set([])
+    is_collide = False
     for sprite in group:
-        is_collide = sprite.collide(other_sprite)
-        if is_collide:
+        if sprite.collide(other_sprite):
             set_remove.add(sprite)
             rock_counter -= 1
+            is_collide = True
     group.difference_update(set_remove)
+    return is_collide
 
 def process_sprite_group(canvas, sprite_group):
     set_remove = set([])
@@ -109,7 +111,12 @@ def process_sprite_group(canvas, sprite_group):
     sprite_group.difference_update(set_remove)
 
 def group_group_collide(rock_group, missile_group):
-    pass
+    global score
+    set_remove = set([])
+    for missile in missile_group:
+        if group_collide(rock_group, missile):
+            missile.lifespan = 0
+            score += 10
 
 # Ship class
 class Ship:
@@ -197,6 +204,12 @@ class Sprite:
             sound.rewind()
             sound.play()
 
+    def get_radius(self):
+        return self.radius
+
+    def get_position(self):
+        return self.pos
+
     def collide(self, other_spite):
         is_collide = False
         distance = dist(self.pos, other_spite.get_position())
@@ -244,16 +257,20 @@ def keyup(key):
 
 # mouseClick handlers that reset UI and conditions whether splash image is drawn
 def click(pos):
-    global started
+    global started, score, lives
     center = [WIDTH / 2, HEIGHT / 2]
     size = splash_info.get_size()
     inwidth = (center[0] - size[0] / 2) < pos[0] < (center[0] + size[0] / 2)
     inheight = (center[1] - size[1] / 2) < pos[1] < (center[1] + size[1] / 2)
     if (not started) and inwidth and inheight:
         started = True
+        score = 0
+        lives = 3
+        soundtrack.rewind()
+        soundtrack.play()
 
 def draw(canvas):
-    global time, started, rock_group, loop, missile_group
+    global time, started, rock_group, loop, missile_group, lives, score, rock_counter
 
     # animate background
     time += 1
@@ -279,9 +296,16 @@ def draw(canvas):
     loop = True
     process_sprite_group(canvas, rock_group)
     process_sprite_group(canvas, missile_group)
+    group_group_collide(rock_group, missile_group)
     loop = False
 
-    group_collide(rock_group, my_ship)
+    if group_collide(rock_group, my_ship):
+        lives -= 1
+        if lives == 0:
+            started = False
+            rock_group = set([])
+            missile_group = set([])
+            rock_counter = 0
 
     # draw splash screen if not started
     if not started:
@@ -305,8 +329,6 @@ frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-missile_group.add(Sprite([-1, -1], [-1, -1], 0, 0, missile_image, missile_info, missile_sound))
-rock_group.add(Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, .1, asteroid_image, asteroid_info))
 
 
 # register handlers
