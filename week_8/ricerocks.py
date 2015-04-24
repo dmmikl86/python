@@ -5,6 +5,7 @@ import random
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
 
+
 # globals for user interface
 ROCK_VELOCITY = .6
 ROCKS_LIMIT = 5
@@ -15,6 +16,7 @@ lives = 3
 time = 0
 started = False
 
+explosion_group = set([])
 missile_group = set([])
 rock_group = set([])
 rock_counter = 0
@@ -94,7 +96,7 @@ def dist(p, q):
     return math.sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2)
 
 def group_collide(group, other_sprite):
-    global rock_counter
+    global rock_counter, explosion_group
     set_remove = set([])
     is_collide = False
     for sprite in group:
@@ -102,6 +104,7 @@ def group_collide(group, other_sprite):
             set_remove.add(sprite)
             rock_counter -= 1
             is_collide = True
+            explosion_group.add(Sprite(sprite.get_position(), (0, 0), 0, 0, explosion_image, explosion_info))
     group.difference_update(set_remove)
     return is_collide
 
@@ -222,8 +225,13 @@ class Sprite:
         return is_collide
 
     def draw(self, canvas):
-        canvas.draw_image(self.image, self.image_center, self.image_size,
-                          self.pos, self.image_size, self.angle)
+        if self.animated:
+            current_explosion_index = (self.age % self.lifespan) // 1
+            current_explosion_center = [self.image_center[0] + current_explosion_index * self.image_size[0], self.image_center[1]]
+            canvas.draw_image(self.image, current_explosion_center, self.image_size, self.pos, self.image_size)
+        else:
+            canvas.draw_image(self.image, self.image_center, self.image_size,
+                              self.pos, self.image_size, self.angle)
 
     def update(self):
         # update age
@@ -302,6 +310,7 @@ def draw(canvas):
     loop = True
     process_sprite_group(canvas, rock_group)
     process_sprite_group(canvas, missile_group)
+    process_sprite_group(canvas, explosion_group)
     group_group_collide(rock_group, missile_group)
     loop = False
 
