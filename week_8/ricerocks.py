@@ -1,9 +1,12 @@
 # implementation of Spaceship - program template for RiceRocks
-import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 import math
 import random
 
+import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
+
 # globals for user interface
+ROCK_VELOCITY = .6
 ROCKS_LIMIT = 5
 WIDTH = 800
 HEIGHT = 600
@@ -111,12 +114,12 @@ def process_sprite_group(canvas, sprite_group):
     sprite_group.difference_update(set_remove)
 
 def group_group_collide(rock_group, missile_group):
-    global score
-    set_remove = set([])
+    global score, ROCK_VELOCITY
     for missile in missile_group:
         if group_collide(rock_group, missile):
             missile.lifespan = 0
             score += 10
+            ROCK_VELOCITY += 0.1
 
 # Ship class
 class Ship:
@@ -157,8 +160,8 @@ class Ship:
         # update velocity
         if self.thrust:
             acc = angle_to_vector(self.angle)
-            self.vel[0] += acc[0] * .1
-            self.vel[1] += acc[1] * .1
+            self.vel[0] += acc[0] * .15
+            self.vel[1] += acc[1] * .15
 
         self.vel[0] *= .99
         self.vel[1] *= .99
@@ -172,10 +175,10 @@ class Ship:
             ship_thrust_sound.pause()
 
     def increment_angle_vel(self):
-        self.angle_vel += .05
+        self.angle_vel += .1
 
     def decrement_angle_vel(self):
-        self.angle_vel -= .05
+        self.angle_vel -= .1
 
     def shoot(self):
         global missile_group
@@ -245,7 +248,7 @@ def keydown(key):
     elif key == simplegui.KEY_MAP['up']:
         my_ship.set_thrust(True)
     elif key == simplegui.KEY_MAP['space']:
-        my_ship.shoot()
+        timer_shoot.start()
 
 def keyup(key):
     if key == simplegui.KEY_MAP['left']:
@@ -254,16 +257,19 @@ def keyup(key):
         my_ship.decrement_angle_vel()
     elif key == simplegui.KEY_MAP['up']:
         my_ship.set_thrust(False)
+    elif key == simplegui.KEY_MAP['space']:
+        timer_shoot.stop()
 
 # mouseClick handlers that reset UI and conditions whether splash image is drawn
 def click(pos):
-    global started, score, lives
+    global started, score, lives, ROCK_VELOCITY
     center = [WIDTH / 2, HEIGHT / 2]
     size = splash_info.get_size()
     inwidth = (center[0] - size[0] / 2) < pos[0] < (center[0] + size[0] / 2)
     inheight = (center[1] - size[1] / 2) < pos[1] < (center[1] + size[1] / 2)
     if (not started) and inwidth and inheight:
         started = True
+        ROCK_VELOCITY = .6
         score = 0
         lives = 3
         soundtrack.rewind()
@@ -307,6 +313,7 @@ def draw(canvas):
             missile_group = set([])
             rock_counter = 0
 
+
     # draw splash screen if not started
     if not started:
         canvas.draw_image(splash_image, splash_info.get_center(),
@@ -315,14 +322,15 @@ def draw(canvas):
 
 # timer handler that spawns a rock    
 def rock_spawner():
-    global rock_group, rock_counter, started, loop
+    global rock_group, rock_counter, started, loop, my_ship
     if rock_counter < ROCKS_LIMIT and started and not loop:
         rock_pos = [random.randrange(0, WIDTH), random.randrange(0, HEIGHT)]
-        rock_vel = [random.random() * .6 - .3, random.random() * .6 - .3]
+        rock_vel = [random.random() * ROCK_VELOCITY - ROCK_VELOCITY / 2, random.random() * ROCK_VELOCITY - ROCK_VELOCITY / 2]
         rock_avel = random.random() * .2 - .1
         a_rock = Sprite(rock_pos, rock_vel, 0, rock_avel, asteroid_image, asteroid_info)
-        rock_group.add(a_rock)
-        rock_counter += 1
+        if not a_rock.collide(my_ship):
+            rock_group.add(a_rock)
+            rock_counter += 1
 
 # initialize stuff
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
@@ -338,6 +346,7 @@ frame.set_mouseclick_handler(click)
 frame.set_draw_handler(draw)
 
 timer = simplegui.create_timer(1000.0, rock_spawner)
+timer_shoot = simplegui.create_timer(50, my_ship.shoot)
 
 # get things rolling
 timer.start()
