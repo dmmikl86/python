@@ -68,6 +68,17 @@ def traverse_grid(start_cell, direction, num_steps, grid):
     # print line
     return line
 
+def is_line_changed(line_grid, line_merge):
+    """
+    check are lines match
+    """
+    num = 0
+    for elem in line_grid:
+        if elem != line_merge[num]:
+            return False
+        num += 1
+    return True
+
 class TwentyFortyEight:
     """
     Class to run the game logic.
@@ -115,25 +126,39 @@ class TwentyFortyEight:
         Move all tiles in the given direction and add
         a new tile if any tiles moved.
         """
-        counter_prev = self.get_tiles_counter()
-        line = []
+
+        line_merge = []
+        is_need_new_tile = False
         if direction == UP:
             for elem in range(self._grid_width):
-                line = merge(traverse_grid((0, elem), OFFSETS[direction], self._grid_height, self._grid))
-                self.set_line_to_grid(line, direction, elem)
+                line_grid = traverse_grid((0, elem), OFFSETS[direction], self._grid_height, self._grid)
+                line_merge = merge(line_grid)
+                if not is_need_new_tile:
+                    is_need_new_tile = not is_line_changed(line_grid, line_merge)
+                self.set_line_to_grid(line_merge, direction, elem)
         elif direction == DOWN:
             for elem in range(self._grid_width):
-                line = merge(traverse_grid((self._grid_height - 1, elem), OFFSETS[direction], self._grid_height, self._grid))
-                self.set_line_to_grid(line, direction, elem)
+                line_grid = traverse_grid((self._grid_height - 1, elem), OFFSETS[direction], self._grid_height, self._grid)
+                line_merge = merge(line_grid)
+                if not is_need_new_tile:
+                    is_need_new_tile = not is_line_changed(line_grid, line_merge)
+                self.set_line_to_grid(line_merge, direction, elem)
         elif direction == RIGHT:
             for elem in range(self._grid_height):
-                line = merge(traverse_grid((elem, self._grid_width - 1), OFFSETS[direction], self._grid_width, self._grid))
-                self.set_line_to_grid(line, direction, elem)
+                line_grid = traverse_grid((elem, self._grid_width - 1), OFFSETS[direction], self._grid_width, self._grid)
+                line_merge = merge(line_grid)
+                if not is_need_new_tile:
+                    is_need_new_tile = not is_line_changed(line_grid, line_merge)
+                self.set_line_to_grid(line_merge, direction, elem)
         else:  # direction == LEFT
             for elem in range(self._grid_height):
-                line = merge(traverse_grid((elem, 0), OFFSETS[direction], self._grid_width, self._grid))
-                self.set_line_to_grid(line, direction, elem)
-        self.new_tile()
+                line_grid = traverse_grid((elem, 0), OFFSETS[direction], self._grid_width, self._grid)
+                line_merge = merge(line_grid)
+                if not is_need_new_tile:
+                    is_need_new_tile = not is_line_changed(line_grid, line_merge)
+                self.set_line_to_grid(line_merge, direction, elem)
+        if is_need_new_tile:
+            self.new_tile()
 
     def set_line_to_grid(self, line, direction, elem):
         """
