@@ -6,6 +6,8 @@ Cookie Clicker Simulator
 import math
 
 import SimpleGUICS2Pygame.codeskulptor as codeskulptor
+# import codeskulptor
+# import simpleplot
 
 codeskulptor.set_timeout(20)
 
@@ -20,20 +22,20 @@ class ClickerState:
     """
 
     def __init__(self):
-        self._totalCookies = float(0.0)
-        self._currentCookies = float(0.0)
-        self._currentTime = float(0.0)
-        self._currentCPS = float(1.0)
+        self._total_cookies = float(0.0)
+        self._current_cookies = float(0.0)
+        self._current_time = float(0.0)
+        self._current_cps = float(1.0)
         self._history = [(0.0, None, 0.0, 0.0)]
 
     def __str__(self):
         """
         Return human readable state
         """
-        return "Time: " + str(self._currentTime) + "\n\t\t" + \
-               " Current Cookies: " + str(self._currentCookies) + "\n\t\t" + \
-               " CPS: " + str(self._currentCPS) + "\n\t\t" + \
-               " Total Cookies: " + str(self._totalCookies)
+        return "\n\t\t Time: " + str(self._current_time) + "\n\t\t" + \
+               " Current Cookies: " + str(self._current_cookies) + "\n\t\t" + \
+               " CPS: " + str(self._current_cps) + "\n\t\t" + \
+               " Total Cookies: " + str(self._total_cookies)
 
     def get_cookies(self):
         """
@@ -42,7 +44,7 @@ class ClickerState:
         
         Should return a float
         """
-        return self._currentCookies
+        return self._current_cookies
 
     def get_cps(self):
         """
@@ -50,7 +52,7 @@ class ClickerState:
 
         Should return a float
         """
-        return self._currentCPS
+        return self._current_cps
 
     def get_time(self):
         """
@@ -58,7 +60,7 @@ class ClickerState:
 
         Should return a float
         """
-        return self._currentTime
+        return self._current_time
 
     def get_history(self):
         """
@@ -81,7 +83,7 @@ class ClickerState:
 
         Should return a float with no fractional part
         """
-        time = (cookies - self._currentCookies) / self._currentCPS
+        time = (cookies - self._current_cookies) / self._current_cps
         if time <= 0:
             time = float(0)
         else:
@@ -97,10 +99,10 @@ class ClickerState:
         if time <= 0.0:
             return
 
-        self._currentTime += time
-        producedCookies = time * self._currentCPS
-        self._currentCookies += producedCookies
-        self._totalCookies += producedCookies
+        self._current_time += time
+        produced_cookies = time * self._current_cps
+        self._current_cookies += produced_cookies
+        self._total_cookies += produced_cookies
 
     def buy_item(self, item_name, cost, additional_cps):
         """
@@ -108,11 +110,12 @@ class ClickerState:
 
         Should do nothing if you cannot afford the item
         """
-        if cost > self._currentCookies: return False
+        if cost > self._current_cookies:
+            return False
 
-        self._currentCookies -= cost
-        self._currentCPS += additional_cps
-        self._history.append((self._currentTime, item_name, cost, self._totalCookies))
+        self._current_cookies -= cost
+        self._current_cps += additional_cps
+        self._history.append((self._current_time, item_name, cost, self._total_cookies))
         return True
 
 def simulate_clicker(build_info, duration, strategy):
@@ -124,14 +127,15 @@ def simulate_clicker(build_info, duration, strategy):
 
     new_build_info = build_info.clone()
     clicker = ClickerState()
-    while clicker.get_time() <= SIM_TIME:
+    while clicker.get_time() <= duration:
         # 2
         # Call the strategy function with the appropriate arguments to determine
         # which item to purchase next. If the strategy function returns None,
         # you should break out of the loop, as that means no more items will be purchased.
-        time_left = SIM_TIME - clicker.get_time()
+        time_left = duration - clicker.get_time()
         item_name = strategy(clicker.get_cookies(), clicker.get_cps(), clicker.get_history(), time_left, new_build_info)
         if item_name is None:
+            clicker.wait(time_left)
             break
 
         # 3
@@ -230,5 +234,5 @@ def run():
     # clicker = ClickerState()
 
 run()
-    
+
 
