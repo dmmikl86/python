@@ -5,9 +5,10 @@ Cookie Clicker Simulator
 # Used to increase the timeout, if necessary
 import math
 
-import SimpleGUICS2Pygame.codeskulptor as codeskulptor
-# import codeskulptor
-# import simpleplot
+# import SimpleGUICS2Pygame.codeskulptor as codeskulptor
+# import SimpleGUICS2Pygame.simpleplot as simpleplot
+# import matplotlib.pyplot as plot
+import codeskulptor
 
 codeskulptor.set_timeout(20)
 
@@ -190,19 +191,69 @@ def strategy_cheap(cookies, cps, history, time_left, build_info):
     """
     Always buy the cheapest item you can afford in the time left.
     """
-    return None
+
+    items = build_info.build_items()
+    min_item_cost = float("inf")
+    cheaper_item = None
+    for item_name in items:
+        item_cost = build_info.get_cost(item_name)
+        time_until_purchase = item_cost / cps
+        if item_cost < min_item_cost and time_until_purchase <= time_left:
+            min_item_cost = item_cost
+            cheaper_item = item_name
+
+    return cheaper_item
 
 def strategy_expensive(cookies, cps, history, time_left, build_info):
     """
     Always buy the most expensive item you can afford in the time left.
     """
-    return None
+
+    items = build_info.build_items()
+    max_item_cost = float("-inf")
+    expensive_item = None
+    for item_name in items:
+        item_cost = build_info.get_cost(item_name)
+        time_until_purchase = item_cost / cps
+        if item_cost > max_item_cost and (time_until_purchase <= time_left or cookies > item_cost):
+            max_item_cost = item_cost
+            expensive_item = item_name
+
+    return expensive_item
 
 def strategy_best(cookies, cps, history, time_left, build_info):
     """
     The best strategy that you are able to implement.
     """
-    return None
+    best_item = None
+    items_cps_cost, min_cps_cost = get_min_cps_cost(build_info)
+
+    best_items = []
+    for item_name in items_cps_cost:
+        if items_cps_cost[item_name] == min_cps_cost:
+            best_items.append((item_name, build_info.get_cost(item_name)))
+
+    cheaper_best_item_cost = float('inf')
+    for item in best_items:
+        if item[1] < cheaper_best_item_cost:
+            cheaper_best_item_cost = item[1]
+            best_item = item[0]
+
+    return best_item
+
+def get_min_cps_cost(build_info):
+    """
+    return items with minimal cps cost
+    """
+    items = build_info.build_items()
+    items_cps_cost = {}
+    for item_name in items:
+        item_cost = build_info.get_cost(item_name)
+        item_cps = build_info.get_cps(item_name)
+        item_cps_cost = int(item_cost / item_cps)
+        items_cps_cost[item_name] = item_cps_cost
+    min_cps_cost = min(items_cps_cost.values())
+    return items_cps_cost, min_cps_cost
 
 def run_strategy(strategy_name, time, strategy):
     """
@@ -224,15 +275,16 @@ def run():
     """
     Run the simulator.
     """
-    run_strategy("Cursor", SIM_TIME, strategy_cursor_broken)
+    # run_strategy("Cursor", SIM_TIME, strategy_none)
 
     # Add calls to run_strategy to run additional strategies
+    # run_strategy("Cursor", SIM_TIME, strategy_cursor_broken)
     # run_strategy("Cheap", SIM_TIME, strategy_cheap)
     # run_strategy("Expensive", SIM_TIME, strategy_expensive)
-    # run_strategy("Best", SIM_TIME, strategy_best)
+    run_strategy("Best", SIM_TIME, strategy_best)
 
     # clicker = ClickerState()
 
-run()
-
-
+# print strategy_expensive(500000.0, 1.0, [(0.0, None, 0.0, 0.0)], 5.0, provided.BuildInfo({'A': [5.0, 1.0], 'C': [50000.0, 3.0], 'B': [500.0, 2.0]}, 1.15))
+# run()
+# plot.show()
