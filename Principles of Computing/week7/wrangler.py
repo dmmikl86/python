@@ -4,10 +4,21 @@ Student code for Word Wrangler game
 
 import urllib2
 import SimpleGUICS2Pygame.codeskulptor as codeskulptor
+import test_wrangler as test
 # import codeskulptor
 import poc_wrangler_provided as provided
 
 WORDFILE = "assets_scrabble_words3.txt"
+
+# Helper functions
+def rec_sorted(list, from_index, to_index):
+    """
+    sorting list in recursive way
+    """
+    pivot_index = (to_index - from_index) / 2
+    pivot_value = list[pivot_index]
+    # todo: sort list
+    return list
 
 
 # Functions to manipulate ordered word lists
@@ -21,7 +32,11 @@ def remove_duplicates(list1):
 
     This function can be iterative.
     """
-    return []
+    unique_list = []
+    for item in list1:
+        if not item in unique_list:
+            unique_list.append(item)
+    return unique_list
 
 def intersect(list1, list2):
     """
@@ -32,7 +47,12 @@ def intersect(list1, list2):
 
     This function can be iterative.
     """
-    return []
+
+    intersect_list = []
+    for item in list1:
+        if item in list2:
+            intersect_list.append(item)
+    return remove_duplicates(intersect_list)
 
 # Functions to perform merge sort
 
@@ -44,9 +64,9 @@ def merge(list1, list2):
     are in either list1 and list2.
 
     This function can be iterative.
-    """   
+    """
     return []
-                
+
 def merge_sort(list1):
     """
     Sort the elements of list1.
@@ -55,7 +75,10 @@ def merge_sort(list1):
 
     This function should be recursive.
     """
-    return []
+    from_index = 0
+    to_index = len(list1) - 1
+    sorted_list = rec_sorted(list1[:], from_index, to_index)
+    return sorted_list
 
 # Function to generate all strings for the word wrangler game
 
@@ -86,13 +109,17 @@ def run():
     Run game.
     """
     words = load_words(WORDFILE)
-    wrangler = provided.WordWrangler(words, remove_duplicates, 
-                                     intersect, merge_sort, 
+    wrangler = provided.WordWrangler(words, remove_duplicates,
+                                     intersect, merge_sort,
                                      gen_all_strings)
     provided.run_game(wrangler)
 
 # Uncomment when you are ready to try the game
 # run()
 
-    
-    
+# Test
+test.run_remove_duplicates_suite(remove_duplicates)
+test.run_intersect_suite(intersect)
+test.run_merge_sort_suite(merge_sort)
+test.run_merge_suite(merge)
+test.run_gen_all_strings_suite(gen_all_strings)
