@@ -3,23 +3,12 @@ Student code for Word Wrangler game
 """
 
 import urllib2
-import SimpleGUICS2Pygame.codeskulptor as codeskulptor
-import test_wrangler as test
-# import codeskulptor
+# import SimpleGUICS2Pygame.codeskulptor as codeskulptor
+# import test_wrangler as test
+import codeskulptor
 import poc_wrangler_provided as provided
 
 WORDFILE = "assets_scrabble_words3.txt"
-
-# Helper functions
-def rec_sorted(list, from_index, to_index):
-    """
-    sorting list in recursive way
-    """
-    pivot_index = (to_index - from_index) / 2
-    pivot_value = list[pivot_index]
-    # todo: sort list
-    return list
-
 
 # Functions to manipulate ordered word lists
 
@@ -62,10 +51,25 @@ def merge(list1, list2):
 
     Returns a new sorted list containing all of the elements that
     are in either list1 and list2.
-
-    This function can be iterative.
     """
-    return []
+    sorted_list = []
+    new_list1 = list1[:]
+    new_list2 = list2[:]
+    while len(new_list1) > 0 or len(new_list2):
+        if len(new_list1) == 0:
+            sorted_list.extend(new_list2)
+            break
+
+        if len(new_list2) == 0:
+            sorted_list.extend(new_list1)
+            break
+
+        if new_list1[0] <= new_list2[0]:
+            sorted_list.append(new_list1.pop(0))
+        else:
+            sorted_list.append(new_list2.pop(0))
+
+    return sorted_list
 
 def merge_sort(list1):
     """
@@ -74,10 +78,16 @@ def merge_sort(list1):
     Return a new sorted list with the same elements as list1.
 
     This function should be recursive.
+    unsorted list
+    merge_sort should use merge to help sort the list!
     """
-    from_index = 0
-    to_index = len(list1) - 1
-    sorted_list = rec_sorted(list1[:], from_index, to_index)
+    pivot = len(list1) / 2
+    if len(list1) == 1 or not list1:
+        return list1[:]
+    else:
+        new_list1 = list1[:pivot]
+        new_list2 = list1[pivot:]
+        sorted_list = merge(merge_sort(new_list1), merge_sort(new_list2))
     return sorted_list
 
 # Function to generate all strings for the word wrangler game
@@ -92,7 +102,20 @@ def gen_all_strings(word):
 
     This function should be recursive.
     """
-    return []
+    if not word:
+        return [word]
+
+    first = word[0]
+    rest = word[1:]
+    rest_strings = gen_all_strings(rest)
+
+    all_strings = list(rest_strings)
+    for string in rest_strings:
+        for idx in range(len(string)+1):
+            new_string = string[:idx] + first + string[idx:]
+            all_strings.append(new_string)
+
+    return all_strings
 
 # Function to load words from a file
 
@@ -102,7 +125,8 @@ def load_words(filename):
 
     Returns a list of strings.
     """
-    return []
+    a_file = urllib2.urlopen(codeskulptor.file2url(filename))
+    return list(a_file.readlines())
 
 def run():
     """
@@ -118,8 +142,10 @@ def run():
 # run()
 
 # Test
-test.run_remove_duplicates_suite(remove_duplicates)
-test.run_intersect_suite(intersect)
-test.run_merge_sort_suite(merge_sort)
-test.run_merge_suite(merge)
-test.run_gen_all_strings_suite(gen_all_strings)
+# print merge_sort([1, 92, 4, 87, 7, 73, 19, 47, 22, 33])
+# test.run_remove_duplicates_suite(remove_duplicates)
+# test.run_intersect_suite(intersect)
+# test.run_merge_sort_suite(merge_sort)
+# test.run_merge_suite(merge)
+# test.run_gen_all_strings_suite(gen_all_strings)
+# print gen_all_strings("123")
