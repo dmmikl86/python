@@ -131,16 +131,74 @@ class Puzzle:
         at the given position in the bottom rows of the puzzle (target_row > 1)
         Returns a boolean
         """
-        # replace with your code
-        return False
+        # Tile zero is positioned at (i,j)
+        # assert self.get_number(target_row, target_col) == 0, "Tile zero is not positioned at ({0},{1})".format(target_row, target_col)
+        if not self.get_number(target_row, target_col) == 0:
+            return False
+        # All tiles in rows i+1 or below are positioned at their solved location
+        for row in range(self.get_height()):
+            if row > target_row:
+                for col in range(self.get_width()):
+                    expected_value = row * self.get_width() + col
+                    # assert expected_value == self.get_number(row, col), "Tile {0}, {1} is not positioned at solved location".format(row, col)
+                    if not expected_value == self.get_number(row, col):
+                        return False
+            # All tiles in row i to the right of position (i,j) are positioned at their solved location
+            if row == target_row:
+                for col in range(self.get_width()):
+                    if col > target_col:
+                        expected_value = row * self.get_width() + col
+                        # assert expected_value == self.get_number(row, col), "Tile {0}, {1} is not positioned at solved location".format(row, col)
+                        if not expected_value == self.get_number(row, col):
+                            return False
+        return True
 
     def solve_interior_tile(self, target_row, target_col):
         """
         Place correct tile at target position
         Updates puzzle and returns a move string
         """
-        # replace with your code
-        return ""
+        puzzle = self.clone()
+        result_forward = ""
+        transfer_position = self.get_transfer_position(target_col, target_row)
+        if transfer_position == (target_row, target_col):
+            return ""
+        # move zero to transfer
+        result_forward += "u" * (target_row - transfer_position[0])
+        result_forward += "l" * (target_col - transfer_position[1])
+        puzzle.update_puzzle(result_forward)
+
+        # if transfer on the target
+        result_back = ""
+        expected_value = target_row * self.get_width() + target_col
+        if expected_value == puzzle.get_number(target_row, target_col):
+            if transfer_position[0] != target_row:
+                result_back += "ld"
+        # move back
+        else:
+            if transfer_position[1] == target_col:
+                result_back += "lddr"
+            else:
+                result_back += "d" * (target_row - transfer_position[0])
+                result_back += "r" * (target_col - transfer_position[1])
+
+        puzzle.update_puzzle(result_back)
+        result = result_forward + result_back + puzzle.solve_interior_tile(target_row, target_col)
+        self.update_puzzle(result)
+        return result
+
+    def get_transfer_position(self, target_col, target_row):
+        """
+        return transfer position
+        """
+        expected_value = target_row * self.get_width() + target_col
+        transfer_position = -1, -1
+        for row in range(self.get_height()):
+            for col in range(self.get_width()):
+                if self.get_number(row, col) == expected_value:
+                    transfer_position = row, col
+        assert transfer_position != (-1, -1), "Not found value: " + expected_value
+        return transfer_position
 
     def solve_col0_tile(self, target_row):
         """
@@ -207,6 +265,10 @@ class Puzzle:
         return ""
 
 # Start interactive simulation
-poc_fifteen_gui.FifteenGUI(Puzzle(4, 4))
+# puzzle = Puzzle(4, 4)
+obj = Puzzle(3, 3, [[3, 2, 1], [6, 5, 4], [0, 7, 8]])
+obj.solve_col0_tile(2)
+poc_fifteen_gui.FifteenGUI(obj)
 
-
+# print puzzle.lower_row_invariant(2, 1)
+# print puzzle.lower_row_invariant(0, 1)
