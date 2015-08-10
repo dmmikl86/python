@@ -153,59 +153,78 @@ class Puzzle:
                             return False
         return True
 
+    def move(self, target_row, target_col, row, column):
+        '''
+        place a tile at target position;
+        target tile's current position must be either above the target position
+        (k < i) or on the same row to the left (i = k and l < j);
+        returns a move string
+        '''
+        move_it = ''
+        combo = 'druld'
+
+        # calculate deltas
+        column_delta = target_col - column
+        row_delta = target_row - row
+
+        # always move up at first
+        move_it += row_delta * 'u'
+        # simplest case, both tiles in the same column, combo 'ld' shall go first
+        if column_delta == 0:
+            move_it += 'ld' + (row_delta - 1) * combo
+        else:
+            # tile is on the left form target, specific move first
+            if column_delta > 0:
+                move_it += column_delta * 'l'
+                if row == 0:
+                    move_it += (abs(column_delta) - 1) * 'drrul'
+                else:
+                    move_it += (abs(column_delta) - 1) * 'urrdl'
+            # tile is on the right from target, specific move first
+            elif column_delta < 0:
+                move_it += (abs(column_delta) - 1)  * 'r'
+                if row == 0:
+                    move_it += abs(column_delta) * 'rdllu'
+                else:
+                    move_it += abs(column_delta) * 'rulld'
+            # apply common move as last
+            move_it += row_delta * combo
+
+        return move_it
+
     def solve_interior_tile(self, target_row, target_col):
         """
         Place correct tile at target position
         Updates puzzle and returns a move string
         """
-        puzzle = self.clone()
-        result_forward = ""
-        transfer_position = self.get_transfer_position(target_col, target_row)
-        if transfer_position == (target_row, target_col):
-            return ""
-        # move zero to transfer
-        result_forward += "u" * (target_row - transfer_position[0])
-        result_forward += "l" * (target_col - transfer_position[1])
-        puzzle.update_puzzle(result_forward)
-
-        # if transfer on the target
-        result_back = ""
-        expected_value = target_row * self.get_width() + target_col
-        if expected_value == puzzle.get_number(target_row, target_col):
-            if transfer_position[0] != target_row:
-                result_back += "ld"
-        # move back
-        else:
-            if transfer_position[1] == target_col:
-                result_back += "lddr"
-            else:
-                result_back += "d" * (target_row - transfer_position[0])
-                result_back += "r" * (target_col - transfer_position[1])
-
-        puzzle.update_puzzle(result_back)
-        result = result_forward + result_back + puzzle.solve_interior_tile(target_row, target_col)
+        row, column = self.current_position(target_row, target_col)
+        result = self.move(target_row, target_col, row, column)
         self.update_puzzle(result)
         return result
 
-    def get_transfer_position(self, target_col, target_row):
-        """
-        return transfer position
-        """
-        expected_value = target_row * self.get_width() + target_col
-        transfer_position = -1, -1
-        for row in range(self.get_height()):
-            for col in range(self.get_width()):
-                if self.get_number(row, col) == expected_value:
-                    transfer_position = row, col
-        assert transfer_position != (-1, -1), "Not found value: " + expected_value
-        return transfer_position
 
     def solve_col0_tile(self, target_row):
         """
         Solve tile in column zero on specified row (> 1)
         Updates puzzle and returns a move string
         """
-        # replace with your code
+        result = "u"
+        result += "r"
+        self.update_puzzle(result)
+        row, column = self.current_position(target_row, 0)
+        if row == target_row and column == 0:
+            # move tile zero to the right end of that row
+            step = (self.get_width() - 2) * "r"
+            self.update_puzzle(step)
+            result += step
+        else:
+            # target tile to position (i-1, 1) and zero tile to position (i-1, 0)
+            step = self.move(target_row - 1, 1, row, column)
+            # use move string for a 3x2 puzzle to bring the target tile into position (i, 0),
+            # then moving tile zero to the right end of row i-1
+            step += "ruldrdlurdluurddlu" + (self.get_width() - 1) * "r"
+            self.update_puzzle(step)
+            result += step
         return ""
 
     #############################################################
@@ -266,8 +285,8 @@ class Puzzle:
 
 # Start interactive simulation
 # puzzle = Puzzle(4, 4)
-obj = Puzzle(3, 3, [[3, 2, 1], [6, 5, 4], [0, 7, 8]])
-obj.solve_col0_tile(2)
+obj = Puzzle(4, 5, [[14, 16, 17, 18, 19], [12, 11, 10, 9, 15], [7, 6, 5, 4, 3], [2, 1, 8, 13, 0]])
+obj.solve_interior_tile(3, 4)
 poc_fifteen_gui.FifteenGUI(obj)
 
 # print puzzle.lower_row_invariant(2, 1)

@@ -2,7 +2,7 @@
 GUI for the Fifteen puzzle
 """
 
-import simplegui
+import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
 # constants
 TILE_SIZE = 60
