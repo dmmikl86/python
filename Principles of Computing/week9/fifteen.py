@@ -182,7 +182,7 @@ class Puzzle:
                     move_it += (abs(column_delta) - 1) * 'urrdl'
             # tile is on the right from target, specific move first
             elif column_delta < 0:
-                move_it += (abs(column_delta) - 1)  * 'r'
+                move_it += (abs(column_delta) - 1) * 'r'
                 if row == 0:
                     move_it += abs(column_delta) * 'rdllu'
                 else:
@@ -201,7 +201,6 @@ class Puzzle:
         result = self.move(target_row, target_col, row, column)
         self.update_puzzle(result)
         return result
-
 
     def solve_col0_tile(self, target_row):
         """
@@ -225,7 +224,7 @@ class Puzzle:
             step += "ruldrdlurdluurddlu" + (self.get_width() - 1) * "r"
             self.update_puzzle(step)
             result += step
-        return ""
+        return result
 
     #############################################################
     # Phase two methods
@@ -236,8 +235,16 @@ class Puzzle:
         at the given column (col > 1)
         Returns a boolean
         """
-        # replace with your code
-        return False
+        if not self.get_number(0, target_col) == 0:
+            return False
+
+        for column in range(self.get_width()):
+            for row in range(self.get_height()):
+                if (row == 0 and column > target_col) or (row == 1 and column >= target_col) or row > 1:
+                    if not (row, column) == self.current_position(row, column):
+                        return False
+
+        return True
 
     def row1_invariant(self, target_col):
         """
@@ -245,8 +252,14 @@ class Puzzle:
         at the given column (col > 1)
         Returns a boolean
         """
-        # replace with your code
-        return False
+        if not self.lower_row_invariant(1, target_col):
+            return False
+
+        for column in range(0, self.get_width()):
+            for row in range(2, self.get_height()):
+                if not (row, column) == self.current_position(row, column):
+                    return False
+        return True
 
     def solve_row0_tile(self, target_col):
         """
@@ -254,15 +267,31 @@ class Puzzle:
         Updates puzzle and returns a move string
         """
         # replace with your code
-        return ""
+        result = 'ld'
+        self.update_puzzle(result)
+
+        row, column = self.current_position(0, target_col)
+        if row == 0 and column == target_col:
+            return result
+        else:
+            step = self.move(1, target_col - 1, row, column)
+            step += 'urdlurrdluldrruld'
+            self.update_puzzle(step)
+            result += step
+
+        return result
 
     def solve_row1_tile(self, target_col):
         """
         Solve the tile in row one at the specified column
         Updates puzzle and returns a move string
         """
-        # replace with your code
-        return ""
+        row, column = self.current_position(1, target_col)
+        result = self.move(1, target_col, row, column)
+        result += 'ur'
+
+        self.update_puzzle(result)
+        return result
 
     ###########################################################
     # Phase 3 methods
@@ -272,8 +301,21 @@ class Puzzle:
         Solve the upper left 2x2 part of the puzzle
         Updates the puzzle and returns a move string
         """
-        # replace with your code
-        return ""
+        result = ''
+        first_step = ''
+
+        if self.get_number(1, 1) == 0:
+            first_step += 'ul'
+            self.update_puzzle(first_step)
+            if (0, 1) == self.current_position(0, 1) and (1, 1) == self.current_position(1, 1):
+                return first_step
+            if self.get_number(0, 1) < self.get_number(1, 0):
+                result += 'rdlu'
+            else:
+                result += 'drul'
+            self.update_puzzle(result)
+
+        return first_step + result
 
     def solve_puzzle(self):
         """
@@ -285,9 +327,7 @@ class Puzzle:
 
 # Start interactive simulation
 # puzzle = Puzzle(4, 4)
-obj = Puzzle(4, 5, [[14, 16, 17, 18, 19], [12, 11, 10, 9, 15], [7, 6, 5, 4, 3], [2, 1, 8, 13, 0]])
-obj.solve_interior_tile(3, 4)
-poc_fifteen_gui.FifteenGUI(obj)
+# poc_fifteen_gui.FifteenGUI(puzzle)
 
 # print puzzle.lower_row_invariant(2, 1)
 # print puzzle.lower_row_invariant(0, 1)
